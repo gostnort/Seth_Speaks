@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seth Speaks - Chapter Reader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .chapter-title {
+            font-family: 'Rockwell', 'Times New Roman', serif;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navigation {
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            text-decoration: none;
+            color: #555;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .content-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .bilingual-content {
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .header-number {
+            color: #667eea;
+        }
+
+        .header-english {
+            color: #667eea;
+            text-align: center;
+            font-family: 'Rockwell', 'Times New Roman', serif;
+        }
+
+        .header-chinese {
+            color: #764ba2;
+            text-align: center;
+            font-family: 'LiSu', '隶书', 'STLiti', 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+
+        .sentence-pair {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            align-items: flex-start;
+        }
+
+        .sentence-pair:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .english-sentence {
+            font-family: 'Rockwell', 'Times New Roman', serif;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .chinese-sentence {
+            font-family: 'LiSu', '隶书', 'STLiti', 'Microsoft YaHei', 'SimHei', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #dc3545;
+            font-size: 1.1rem;
+        }
+
+        .chapter-end {
+            text-align: center;
+            padding: 2rem;
+            font-style: italic;
+            color: #666;
+            background: rgba(102, 126, 234, 0.1);
+            margin-top: 2rem;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sentence-pair {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                gap: 0.5rem;
+            }
+            
+            .sentence-number {
+                grid-row: 1 / 3;
+                align-self: start;
+            }
+            
+            .english-sentence {
+                grid-column: 2;
+                grid-row: 1;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .chinese-sentence {
+                grid-column: 2;
+                grid-row: 2;
+                padding-top: 0.5rem;
+            }
+            
+            .content-header {
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+            }
+            
+            .header-english {
+                grid-column: 2;
+                grid-row: 1;
+                text-align: left;
+            }
+            
+            .header-chinese {
+                grid-column: 2;
+                grid-row: 2;
+                text-align: left;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .chapter-title {
+                font-size: 2rem;
+            }
+        }
+
+        .sentence-number {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #555;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="navigation">
+                <a href="index.html" class="nav-link">← Back to Index</a>
+            </div>
+            <h1 class="chapter-title" id="chapterTitle">Loading Chapter...</h1>
+        </div>
+
+        <div class="content-container">
+            <div id="loadingMessage" class="loading">
+                Loading chapter content...
+            </div>
+            <div id="errorMessage" class="error" style="display: none;">
+                Failed to load chapter content. Please check if the file exists.
+            </div>
+            <div id="content" style="display: none;">
+                <div class="bilingual-content">
+                    <div class="content-header">
+                        <div class="header-number">#</div>
+                        <div class="header-english">English</div>
+                        <div class="header-chinese">中文</div>
+                    </div>
+                    <div id="sentencePairs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get chapter parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const chapterFile = urlParams.get('chapter') || 'Chapter_1.txt';
+        
+        // Update page title
+        document.title = `Seth Speaks - ${chapterFile.replace('.txt', '').replace('_', ' ')}`;
+        
+        async function loadChapter(filename) {
+            try {
+                const response = await fetch(`origin/${filename}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                parseAndDisplayContent(text, filename);
+            } catch (error) {
+                console.error('Error loading chapter:', error);
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').innerHTML = `
+                    Failed to load chapter: ${filename}<br>
+                    <small>Make sure the file exists in the 'origin' folder</small>
+                `;
+            }
+        }
+        
+        function parseAndDisplayContent(text, filename) {
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            const englishSentences = [];
+            const chineseSentences = [];
+            
+            // Parse the bilingual content - odd lines are English, even lines are Chinese
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line === '') continue;
+                
+                // Skip the end marker
+                if (line.includes('🚩')) {
+                    break;
+                }
+                
+                if (i % 2 === 0) {
+                    // Even index (odd line number) = English
+                    englishSentences.push(line);
+                } else {
+                    // Odd index (even line number) = Chinese
+                    chineseSentences.push(line);
+                }
+            }
+            
+            // Update chapter title
+            const chapterName = filename.replace('.txt', '').replace('_', ' ');
+            document.getElementById('chapterTitle').textContent = chapterName;
+            
+            // Display content
+            displayBilingualContent(englishSentences, chineseSentences);
+            
+            // Hide loading message and show content
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+        
+        function displayBilingualContent(englishSentences, chineseSentences) {
+            const sentencePairsContainer = document.getElementById('sentencePairs');
+            sentencePairsContainer.innerHTML = '';
+            
+            const maxLength = Math.max(englishSentences.length, chineseSentences.length);
+            
+            for (let i = 0; i < maxLength; i++) {
+                const sentenceNumber = i + 1;
+                
+                // Create sentence pair row
+                const pairDiv = document.createElement('div');
+                pairDiv.className = 'sentence-pair';
+                
+                const englishText = i < englishSentences.length ? englishSentences[i] : '';
+                const chineseText = i < chineseSentences.length ? chineseSentences[i] : '';
+                
+                pairDiv.innerHTML = `
+                    <span class="sentence-number">${sentenceNumber}</span>
+                    <div class="english-sentence">${englishText}</div>
+                    <div class="chinese-sentence">${chineseText}</div>
+                `;
+                
+                sentencePairsContainer.appendChild(pairDiv);
+            }
+            
+            // Add chapter end marker
+            const chapterEnd = document.createElement('div');
+            chapterEnd.className = 'chapter-end';
+            chapterEnd.innerHTML = `
+                <strong>End of Chapter • 章节结束</strong><br>
+                <small>Total sentences: ${maxLength} • 总句数: ${maxLength}</small><br><br>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.7); border-radius: 8px; font-size: 0.9rem; color: #666; border-left: 4px solid #667eea;">
+                    <strong>📝 Note:</strong> This content was originally transcribed from voice-to-text recordings and has been edited for clarity and accuracy.<br>
+                    <strong>📝 注意：</strong>此内容原本来自语音转文字记录，已经过编辑以提高清晰度和准确性。
+                </div>
+            `;
+            sentencePairsContainer.appendChild(chapterEnd);
+        }
+        
+        // Load the chapter when page loads
+        loadChapter(chapterFile);
+    </script>
+</body>
+</html>

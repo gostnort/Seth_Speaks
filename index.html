@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seth Speaks - 赛斯书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chinese-title {
+            font-size: 2.5rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        .chapter-list {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .chapter-item {
+            display: block;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, #f6f9fc, #e9ecef);
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chapter-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .chapter-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .chinese-title {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">Seth Speaks</h1>
+            <h2 class="chinese-title">赛斯书</h2>
+            <p class="subtitle">The Eternal Validity of the Soul • 灵魂的永恒价值</p>
+            <h3> Jane Roberts (Author), Robert F. Butts (Contributor)</h3>
+        </div>
+
+        <div class="chapter-list" id="chapterList">
+            <!-- Chapters will be loaded dynamically -->
+        </div>
+
+        <div class="footer">
+            <p>A bilingual presentation of Seth's teachings. </p>
+            <p>赛斯教导的双语呈现</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration for available chapters
+        const availableChapters = [
+            {
+                filename: 'Chapter_1.txt',
+                englishTitle: 'I Do Not Have a Physical Body, Yet I Am Writing This Book',
+                chineseTitle: '我没有肉体，却在写这本书'
+            }
+            // Add more chapters here as they become available
+        ];
+
+        function loadChapterList() {
+            const chapterListContainer = document.getElementById('chapterList');
+            
+            if (availableChapters.length === 0) {
+                chapterListContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <p>No chapters available yet.</p>
+                        <p>没有可用的章节。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            availableChapters.forEach((chapter, index) => {
+                const chapterNumber = index + 1;
+                const chapterItem = document.createElement('a');
+                chapterItem.href = `chapter.html?chapter=${encodeURIComponent(chapter.filename)}`;
+                chapterItem.className = 'chapter-item';
+                
+                chapterItem.innerHTML = `
+                    <div class="chapter-title">Chapter ${chapterNumber}: ${chapter.englishTitle}</div>
+                    <div class="chapter-subtitle">第${chapterNumber}章：${chapter.chineseTitle}</div>
+                `;
+                
+                chapterListContainer.appendChild(chapterItem);
+            });
+        }
+
+        // Load chapter list when page loads
+        document.addEventListener('DOMContentLoaded', loadChapterList);
+    </script>
+</body>
+</html>
