@@ -1,17 +1,38 @@
 // Try to load a generated manifest `chapters.json` from the site root.
-// If it's missing or fails, fall back to a small embedded list.
-const fallbackChapters = [
-    {
-        filename: 'Chapter_1.txt',
-        englishTitle: 'I Do Not Have a Physical Body, Yet I Am Writing This Book',
-        chineseTitle: '我没有肉体，却在写这本书'
-    },
-    {
-        filename: 'Chapter_2.txt',
-        englishTitle: 'My present environment, Work, and activities.',
-        chineseTitle: '我现在所处的环境、工作和活动。'
+// If it's missing or fails, generate the chapter list from `chapters.config.json`
+// and read the first two non-empty lines of each chapter file to use as titles.
+
+async function buildChaptersFromConfig() {
+    try {
+        const resp = await fetch('chapters.config.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const cfg = await resp.json();
+        if (!cfg || !Array.isArray(cfg.sequence)) throw new Error('Invalid chapters.config.json');
+
+        const results = [];
+        for (const filename of cfg.sequence) {
+            try {
+                const fresp = await fetch(`origin/${filename}`, { cache: 'no-store' });
+                if (!fresp.ok) throw new Error(`HTTP ${fresp.status}`);
+                const text = await fresp.text();
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l !== '');
+                results.push({
+                    filename,
+                    line1: lines[0] || '',
+                    line2: lines[1] || ''
+                });
+            } catch (err) {
+                console.warn('Failed to read', filename, err);
+                results.push({ filename, line1: '', line2: '' });
+            }
+        }
+
+        return results;
+    } catch (err) {
+        console.warn('Could not load chapters.config.json', err);
+        return [];
     }
-];
+}
 
 async function fetchChaptersManifest() {
     try {
@@ -21,8 +42,10 @@ async function fetchChaptersManifest() {
         if (!Array.isArray(json)) throw new Error('Invalid manifest');
         return json;
     } catch (err) {
-        console.warn('Could not load chapters.json, using fallback list.', err);
-        return fallbackChapters;
+        console.warn('Could not load chapters.json, attempting to build from chapters.config.json', err);
+        const built = await buildChaptersFromConfig();
+        if (built && built.length > 0) return built;
+        return [];
     }
 }
 
@@ -51,8 +74,8 @@ async function loadChapterList() {
         const chinese = chapter.chineseTitle || chapter.line2 || '';
 
         chapterItem.innerHTML = `
-            <div class="chapter-title">Chapter ${chapterNumber}: ${escapeHtml(english)}</div>
-            <div class="chapter-subtitle">第${chapterNumber}章：${escapeHtml(chinese)}</div>
+            <div class="chapter-title"> ${escapeHtml(english)}</div>
+            <div class="chapter-subtitle"> ${escapeHtml(chinese)}</div>
         `;
 
         chapterListContainer.appendChild(chapterItem);
